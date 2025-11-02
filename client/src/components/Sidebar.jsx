@@ -16,8 +16,21 @@ const Sidebar = () => {
   const { logout, onlineUsers } = useContext(AuthContext);
 
   const [input, setInput] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navigate = useNavigate();
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(".menu-container")) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const filteredUsers = input
     ? users.filter((user) =>
@@ -35,7 +48,7 @@ const Sidebar = () => {
 
   useEffect(() => {
     getUsers();
-  }, [onlineUsers]);
+  }, [onlineUsers, getUsers]);
 
   return (
     <div
@@ -46,21 +59,35 @@ const Sidebar = () => {
       <div className="pb-5">
         <div className="flex justify-between items-center">
           <img src={assets.logo} alt="logo" className="max-w-40" />
-          <div className="relative py-2 group">
+          <div className="relative py-2 menu-container">
             <img
               src={assets.menu_icon}
               alt="Menu"
               className="max-h-5 cursor-pointer"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
             />
-            <div className="absolute top-full right-0 z-20 w-32 p-5 rounded-md bg-[#282142] border border-gray-600 text-gray-100 hidden group-hover:block">
+            <div
+              className={`absolute top-full right-0 z-20 w-32 p-5 rounded-md bg-[#282142] border border-gray-600 text-gray-100 ${
+                isMenuOpen ? "block" : "hidden"
+              }`}
+            >
               <p
-                onClick={() => navigate("/profile")}
+                onClick={() => {
+                  navigate("/profile");
+                  setIsMenuOpen(false);
+                }}
                 className="cursor-pointer text-sm"
               >
                 Edit Profile
               </p>
               <hr className="my-2 border-t border-gray-500" />
-              <p onClick={() => logout()} className="cursor-pointer text-sm">
+              <p
+                onClick={() => {
+                  logout();
+                  setIsMenuOpen(false);
+                }}
+                className="cursor-pointer text-sm"
+              >
                 Logout
               </p>
             </div>
@@ -78,7 +105,7 @@ const Sidebar = () => {
       </div>
 
       <div className="flex flex-col">
-        {sortedUsers.map((user, index) => (
+        {sortedUsers.map((user) => (
           <div
             onClick={() => {
               setSelectedUser(user);
