@@ -13,7 +13,7 @@ const ProfilePage = () => {
     e.preventDefault();
     if (!selectedImage) {
       await updateProfile({ fullName: name, bio });
-      navigate("/");
+      setTimeout(() => navigate("/"), 750);
       return;
     }
     const reader = new FileReader();
@@ -21,7 +21,7 @@ const ProfilePage = () => {
     reader.onload = async () => {
       const base64Image = reader.result;
       await updateProfile({ profilePic: base64Image, fullName: name, bio });
-      navigate("/");
+     setTimeout(() => navigate("/"), 750);
     };
   };
 
