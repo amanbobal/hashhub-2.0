@@ -68,18 +68,23 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Update profile function to handle user profile update
-  const updateProfile = async (body) => {
-    try {
-      const { data } = await axios.put("api/auth/update-profile", body);
-      if (data.success) {
-        setAuthUser(data.userData);
-        toast.success("Profile updated successfully");
-      }
-    } catch (error) {
-      toast.error(error.message);
-    }
-  };
+const updateProfile = async (body) => {
+  try {
+    const { data } = await axios.put("api/auth/update-profile", body);
 
+    if (data.success) {
+      toast.success("Profile updated successfully");
+
+      // 👇 Refresh the user data from backend to prevent null authUser
+      await checkAuth();
+    } else {
+      toast.error(data.message || "Failed to update profile");
+    }
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    toast.error(error.response?.data?.message || error.message);
+  }
+};
   // Connect socket function to handle socket connection and online user updates
   const connectSocket = (userData) => {
     if (!userData) return;
